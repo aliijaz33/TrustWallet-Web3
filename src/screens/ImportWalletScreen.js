@@ -11,9 +11,8 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { ethers } from 'ethers';
-import * as Keychain from 'react-native-keychain';
-import EthereumServiceInstance from '../services/EthereumService'; // Updated import
-import WalletStorageInstance from '../services/WalletStorage'; // Updated import
+import EthereumServiceInstance from '../services/EthereumService';
+import WalletStorageInstance from '../services/WalletStorage';
 
 const ImportWalletScreen = () => {
   const navigation = useNavigation();
@@ -25,32 +24,20 @@ const ImportWalletScreen = () => {
       Alert.alert('Error', 'Please enter your recovery phrase');
       return;
     }
-
     setIsLoading(true);
-
     try {
-      // Clean up the mnemonic input
       const cleanedMnemonic = mnemonic
         .trim()
         .toLowerCase()
         .replace(/\s+/g, ' ');
 
-      // Validate mnemonic - v6 syntax
       if (!ethers.Mnemonic.isValidMnemonic(cleanedMnemonic)) {
         throw new Error('Invalid recovery phrase. Please check your words.');
       }
-
-      // Test derivation to ensure it works - v6 syntax
       const path = "m/44'/60'/0'/0/0";
       const wallet = ethers.HDNodeWallet.fromPhrase(cleanedMnemonic, path);
-
-      // Store the mnemonic securely
       await WalletStorageInstance.saveMnemonic(cleanedMnemonic);
-
-      // Initialize the wallet
       EthereumServiceInstance.initializeWallet(cleanedMnemonic);
-
-      // Navigate to wallet home
       navigation.reset({
         index: 0,
         routes: [{ name: 'WalletHome' }],
@@ -122,7 +109,6 @@ const ImportWalletScreen = () => {
   );
 };
 
-// Your existing styles remain the same
 const styles = StyleSheet.create({
   container: {
     flex: 1,

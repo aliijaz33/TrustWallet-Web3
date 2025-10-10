@@ -1,11 +1,9 @@
 import * as Keychain from 'react-native-keychain';
-// REMOVE EthereumService import - no circular dependency
 
 const WALLET_SERVICE = 'mini_trust_wallet';
 const MNEMONIC_KEY = 'wallet_mnemonic';
 
 class WalletStorage {
-  // Save mnemonic to secure storage
   async saveMnemonic(mnemonic) {
     try {
       await Keychain.setGenericPassword(MNEMONIC_KEY, mnemonic, {
@@ -20,7 +18,6 @@ class WalletStorage {
     }
   }
 
-  // Get mnemonic from secure storage
   async getMnemonic() {
     try {
       const credentials = await Keychain.getGenericPassword({
@@ -38,7 +35,6 @@ class WalletStorage {
     }
   }
 
-  // Check if wallet exists
   async walletExists() {
     try {
       const mnemonic = await this.getMnemonic();
@@ -48,7 +44,6 @@ class WalletStorage {
     }
   }
 
-  // Delete wallet (reset)
   async deleteWallet() {
     try {
       await Keychain.resetGenericPassword({
@@ -63,6 +58,5 @@ class WalletStorage {
   }
 }
 
-// Create a singleton instance
 const WalletStorageInstance = new WalletStorage();
 export default WalletStorageInstance;

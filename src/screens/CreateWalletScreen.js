@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -10,9 +10,8 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { ethers } from 'ethers';
-import * as Keychain from 'react-native-keychain';
-import EthereumServiceInstance from '../services/EthereumService'; // Updated import
-import WalletStorageInstance from '../services/WalletStorage'; // Updated import
+import EthereumServiceInstance from '../services/EthereumService';
+import WalletStorageInstance from '../services/WalletStorage';
 
 const CreateWalletScreen = () => {
   const navigation = useNavigation();
@@ -21,7 +20,6 @@ const CreateWalletScreen = () => {
 
   const generateWallet = () => {
     try {
-      // Generate a random mnemonic (12 words)
       const newMnemonic = ethers.Wallet.createRandom().mnemonic.phrase;
       setMnemonic(newMnemonic);
       setIsConfirmed(false);
@@ -34,13 +32,9 @@ const CreateWalletScreen = () => {
     if (!mnemonic) return;
 
     try {
-      // Store the mnemonic securely
-      await WalletStorageInstance.saveMnemonic(mnemonic); // Updated
+      await WalletStorageInstance.saveMnemonic(mnemonic);
+      EthereumServiceInstance.initializeWallet(mnemonic);
 
-      // Initialize the wallet in EthereumService
-      EthereumServiceInstance.initializeWallet(mnemonic); // Updated
-
-      // Navigate to wallet home
       navigation.reset({
         index: 0,
         routes: [{ name: 'WalletHome' }],
@@ -64,7 +58,7 @@ const CreateWalletScreen = () => {
     );
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!mnemonic) {
       generateWallet();
     }

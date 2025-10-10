@@ -5,6 +5,7 @@ import WelcomeScreen from '../screens/WelcomeScreen';
 import CreateWalletScreen from '../screens/CreateWalletScreen';
 import ImportWalletScreen from '../screens/ImportWalletScreen';
 import WalletHomeScreen from '../screens/WalletHomeScreen';
+import SettingsScreen from '../screens/SettingsScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -21,6 +22,7 @@ const AppNavigator = () => {
         <Stack.Screen name="CreateWallet" component={CreateWalletScreen} />
         <Stack.Screen name="ImportWallet" component={ImportWalletScreen} />
         <Stack.Screen name="WalletHome" component={WalletHomeScreen} />
+        <Stack.Screen name="Settings" component={SettingsScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

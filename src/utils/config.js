@@ -1,4 +1,3 @@
-// Simple config without react-native-config
 export const ETH_RPC_URL = 'https://cloudflare-eth.com';
 
 export default {

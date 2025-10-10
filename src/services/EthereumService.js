@@ -3,7 +3,6 @@ import { ETH_RPC_URL } from '../utils/config';
 
 class EthereumService {
   constructor() {
-    // Ethers v6: JsonRpcProvider is directly on ethers, not ethers.providers
     this.provider = new ethers.JsonRpcProvider(ETH_RPC_URL);
     this.wallet = null;
     console.log(
@@ -12,33 +11,20 @@ class EthereumService {
     );
   }
 
-  // Initialize wallet from mnemonic using BIP-44 path: m/44'/60'/0'/0
   initializeWallet(mnemonic) {
     try {
-      // Clean the mnemonic
       const cleanedMnemonic = mnemonic
         .trim()
         .toLowerCase()
         .replace(/\s+/g, ' ');
 
-      // Validate mnemonic - v6 syntax
       if (!ethers.Mnemonic.isValidMnemonic(cleanedMnemonic)) {
         throw new Error('Invalid recovery phrase');
       }
 
-      // Create wallet from mnemonic with BIP-44 path for first ETH account
       const path = "m/44'/60'/0'/0/0";
-
-      // v6 syntax: HDNodeWallet.fromPhrase
       const wallet = ethers.HDNodeWallet.fromPhrase(cleanedMnemonic, path);
-
-      // Connect to provider
       this.wallet = wallet.connect(this.provider);
-
-      console.log(
-        'TrustWallet: Wallet initialized with address:',
-        this.getAddress(),
-      );
       return this.getAddress();
     } catch (error) {
       console.error('TrustWallet: Failed to initialize wallet:', error);
@@ -46,7 +32,6 @@ class EthereumService {
     }
   }
 
-  // Get checksummed address (EIP-55) - v6 syntax
   getAddress() {
     if (!this.wallet) {
       throw new Error('Wallet not initialized');
@@ -54,24 +39,34 @@ class EthereumService {
     return ethers.getAddress(this.wallet.address);
   }
 
-  // Get ETH balance in ETH units (not wei) - v6 syntax
   async getBalance() {
     if (!this.wallet) {
       throw new Error('Wallet not initialized');
     }
-
     try {
-      const balanceWei = await this.provider.getBalance(this.wallet.address);
+      const balanceWei = await Promise.race([
+        this.provider.getBalance(this.wallet.address),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Timeout')), 5000),
+        ),
+      ]);
+
       const balanceEth = ethers.formatEther(balanceWei);
       console.log('TrustWallet: Balance fetched:', balanceEth, 'ETH');
       return balanceEth;
     } catch (error) {
       console.error('TrustWallet: Error fetching balance:', error);
+      if (
+        error.message.includes('timeout') ||
+        error.message.includes('Internal error')
+      ) {
+        return '0';
+      }
+
       throw new Error('Failed to fetch balance: ' + error.message);
     }
   }
 
-  // Generate new wallet with 12-word mnemonic - v6 syntax
   generateNewWallet() {
     try {
       const wallet = ethers.Wallet.createRandom();
@@ -88,7 +83,6 @@ class EthereumService {
     }
   }
 
-  // Validate mnemonic - v6 syntax
   validateMnemonic(mnemonic) {
     try {
       const cleanedMnemonic = mnemonic
@@ -102,6 +96,5 @@ class EthereumService {
   }
 }
 
-// Create a singleton instance
 const EthereumServiceInstance = new EthereumService();
 export default EthereumServiceInstance;

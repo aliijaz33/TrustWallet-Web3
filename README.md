@@ -1,6 +1,7 @@
 # React Native Mini Trust Wallet
 
 A minimal Ethereum wallet implementation built with React Native for Android, featuring secure key management, BIP-39 mnemonic support, and real-time balance tracking.
+I have used JavaScript for now. as i told earlier that i have to learn TypeScript so for now i have used javaScript. Later on i may update it with TypeScript.
 
 ## 🚀 Features
 
